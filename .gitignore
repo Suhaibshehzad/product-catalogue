@@ -1,0 +1,19 @@
+# Env
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# Xcode / Swift
+.build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+.swiftpm/
+
+# OS
+.DS_Store
