@@ -30,3 +30,17 @@ Full plan and assumptions: `docs/PLAN.md`. Read it before making changes.
 - Backend: `cd backend && npm install && npm run dev` · tests: `npm test`
 - Mail inbox (dev): `mailpit` → http://localhost:8025
 - iOS core tests: `cd ios/Core && swift test`
+
+## Status (remove this section before opening the PR)
+
+Written on a machine that could not reach registry.npmjs.org, so the **backend has never been
+installed, type-checked, tested or run**. iOS is built and tested against stub data only.
+To finish on a machine with npm access:
+
+1. `cd backend && npm install fastify @fastify/rate-limit nodemailer zod dotenv && npm install -D typescript tsx vitest @types/node @types/nodemailer`
+   (records deps in package.json + lockfile — commit both; verify lockfile has no private registry URLs)
+2. `npm run typecheck && npm test` — fix anything that fails.
+3. `brew install mailpit && mailpit` (inbox at http://localhost:8025), then `cp .env.example .env && npm run dev`.
+4. `scripts/e2e-smoke.sh` — every check must pass.
+5. iOS live flow: `cd ios && TEST_RUNNER_LIVE_BACKEND=1 xcodebuild test -project Catalogue.xcodeproj -scheme Catalogue -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:CatalogueUITests/LiveBackendUITests`
+6. Then: README.md, DECISIONS.md, AI_USAGE.md (incl. time spent), push, open PR.
