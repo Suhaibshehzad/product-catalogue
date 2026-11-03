@@ -38,8 +38,9 @@ Android/web clients. See [`docs/PLAN.md`](docs/PLAN.md#deliberately-out-of-scope
 - `POST /api/enquiries` is rate-limited to 5 requests per minute per IP. Rejected (400) requests
   count toward the limit too, which makes form spam harder.
 - iOS App Transport Security allows plain HTTP only to local addresses.
-- **Known gap:** the backend binds to `0.0.0.0` by default, so in dev it is reachable from the local
-  network/VPN as well as localhost. Set `HOST=127.0.0.1` to restrict it.
+- The backend binds to `127.0.0.1` by default, so in dev it is not reachable from the local
+  network or VPN. The simulator shares the Mac's loopback interface, so it still works. To test on a
+  physical device, set `HOST=0.0.0.0` and point `API_BASE_URL` at the Mac's LAN address.
 
 ## Build & verification notes
 

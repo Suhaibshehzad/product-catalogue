@@ -7,7 +7,8 @@ const idList = z
 
 const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
-  HOST: z.string().default('0.0.0.0'),
+  // Loopback only by default; set 0.0.0.0 to serve a physical device on the LAN.
+  HOST: z.string().default('127.0.0.1'),
   FAKESTORE_BASE_URL: z.string().url().default('https://fakestoreapi.com'),
   PRODUCT_CACHE_TTL_SECONDS: z.coerce.number().int().nonnegative().default(300),
   FEATURED_PRODUCT_IDS: idList,

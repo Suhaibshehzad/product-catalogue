@@ -16,6 +16,7 @@ describe('loadConfig', () => {
     expect(config.SMTP_PORT).toBe(1025);
     expect(config.SMTP_SECURE).toBe(false);
     expect(config.PORT).toBe(3000);
+    expect(config.HOST).toBe('127.0.0.1');
   });
 
   it('fails fast listing every invalid variable', () => {
