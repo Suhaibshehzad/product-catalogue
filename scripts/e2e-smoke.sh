@@ -13,7 +13,10 @@ fail() { printf '  \033[31m✘\033[0m %s\n' "$1"; failures=$((failures + 1)); }
 # Evaluates a JS expression against JSON on stdin (`d` is the parsed body).
 json() { node -e "let s='';process.stdin.on('data',c=>s+=c).on('end',()=>{const d=JSON.parse(s);console.log($1)})"; }
 status() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
-check() { if [ "$2" = "$3" ]; then pass "$1"; else fail "$1 (expected $3, got $2)"; fi; }
+check() {
+  if [ "$#" -ne 3 ]; then fail "$1 (check got $# args — a value was word-split)"
+  elif [ "$2" = "$3" ]; then pass "$1"; else fail "$1 (expected $3, got $2)"; fi
+}
 
 echo "Backend: $API   Mailpit: $MAILPIT"
 
@@ -37,12 +40,16 @@ check "search with no matches is empty" "$(curl -sf "$API/api/products?q=zzzqqq"
 id=$(echo "$featured" | json 'd.products[0].id')
 check "product page loads" "$(curl -sf "$API/api/products/$id" | json 'd.product.id')" "$id"
 
+# Bodies are built outside "$(...)": bash 3.2 (macOS default) mis-parses escaped quotes
+# there and brace-expands the JSON into several requests.
+invalid_body='{"productId":"'"$id"'","name":"","email":"nope"}'
 check "invalid enquiry is rejected" "$(status -X POST "$API/api/enquiries" \
-  -H 'content-type: application/json' -d "{\"productId\":\"$id\",\"name\":\"\",\"email\":\"nope\"}")" 400
+  -H 'content-type: application/json' -d "$invalid_body")" 400
 
 marker="E2E$(date +%s)"  # no hyphen: Mailpit treats "-term" as exclusion
-check "valid enquiry is accepted" "$(status -X POST "$API/api/enquiries" -H 'content-type: application/json' \
-  -d "{\"productId\":\"$id\",\"name\":\"$marker\",\"email\":\"e2e@example.com\",\"message\":\"Smoke test\"}")" 202
+valid_body='{"productId":"'"$id"'","name":"'"$marker"'","email":"e2e@example.com","message":"Smoke test"}'
+check "valid enquiry is accepted" "$(status -X POST "$API/api/enquiries" \
+  -H 'content-type: application/json' -d "$valid_body")" 202
 
 found=0
 for _ in 1 2 3 4 5; do

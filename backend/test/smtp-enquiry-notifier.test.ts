@@ -5,7 +5,7 @@ import { product } from './fakes.js';
 
 describe('SmtpEnquiryNotifier', () => {
   it('sends a plain-text email to the sales inbox with reply-to set to the customer', async () => {
-    const sendMail = vi.fn(async () => ({}));
+    const sendMail = vi.fn(async (_mail: Record<string, unknown>) => ({}));
     const notifier = new SmtpEnquiryNotifier(
       { host: 'h', port: 1, secure: false, from: 'shop@example.com', to: 'sales@example.com' },
       { sendMail } as unknown as Transporter,
@@ -17,7 +17,7 @@ describe('SmtpEnquiryNotifier', () => {
       receivedAt: new Date('2026-11-02T10:00:00Z'),
     });
 
-    const mail = sendMail.mock.calls[0]![0] as Record<string, unknown>;
+    const mail = sendMail.mock.calls[0]![0];
     expect(mail).toMatchObject({
       from: 'shop@example.com',
       to: 'sales@example.com',
