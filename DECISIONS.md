@@ -26,6 +26,34 @@ Assumptions, cuts and judgement calls. The fuller rationale for the product assu
 - **iOS logic lives in the `Core` Swift package**, so it is testable with `swift test` and the
   upcoming visual redesign only touches the thin SwiftUI layer.
 
+## How the design grows beyond the PoC
+
+Each change the brief anticipates has a single place to land:
+
+| Expected change | Where it lands | What stays untouched |
+|-----------------|----------------|----------------------|
+| Product data source (real catalogue, CMS, DB) | A new `ProductSource` adapter, wired in `server.ts` | Services, routes, API contract, iOS app |
+| Email provider (SES, SendGrid) | A new `EnquiryNotifier` adapter | Enquiry validation, service, app flow |
+| Look and feel (creative work in progress) | SwiftUI views in `ios/App` | `CatalogueCore` view models, networking, tests |
+| More clients (web, Android) | Call the same `/api` contract | Backend and data source |
+| Curated "top rated" moving to an admin tool | Replace the `FEATURED_PRODUCT_IDS` config read | Home page logic and contract |
+
+Tests target the seams: services are tested with fake ports, routes through `inject()`, and view
+models with a mock repository. Swapping an adapter therefore doesn't invalidate the suite.
+
+## Next, with another day
+
+1. **Contract as code:** generate an OpenAPI spec from the zod schemas and check the iOS models
+   against it in CI, so client and backend can't drift.
+2. **CI:** GitHub Actions running typecheck, backend tests, `swift test` and the smoke script on
+   every PR.
+3. **Enquiry reliability:** queue enquiries (e.g. SQS) with retry, so a mail outage doesn't lose a
+   lead. Today a failure is shown to the customer and they retry.
+4. **Deploy to AWS:** the backend in a container on App Runner or ECS, SES for email, config from
+   SSM Parameter Store. The code needs no changes, only adapters and config.
+5. **Product polish:** images cached on the client, accessibility pass (Dynamic Type,
+   VoiceOver labels), and pagination once the catalogue outgrows 20 products.
+
 ## Cuts (out of scope)
 
 Auth, basket/checkout, pagination, a database, design system/branding, AWS infrastructure,

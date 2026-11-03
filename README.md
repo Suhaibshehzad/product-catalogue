@@ -15,6 +15,14 @@ The app talks only to the backend. The backend owns the `Product` contract and i
 component that calls the Fake Store API, so the data source, email provider and visual design can
 each change without touching the others.
 
+## Stack choice
+
+| Layer   | Choice | Why |
+|---------|--------|-----|
+| Client  | iOS app, Swift 6 + SwiftUI (iOS 17+) | My strongest platform, so review time goes on design rather than syntax. `@Observable` + async/await keep the view models small and testable without a simulator. |
+| Backend | Node.js + TypeScript (Fastify) | TypeScript strict mode catches contract drift early; Fastify's `inject()` gives fast HTTP tests without a live server; zod validates both requests and the upstream Fake Store data. |
+| Email   | SMTP via nodemailer → Mailpit | Free, local and account-free, as the brief requires. Production can switch to SES or another provider by changing config or adding one adapter. |
+
 ## Requirements
 
 - Node.js 22+
