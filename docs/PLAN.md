@@ -53,9 +53,9 @@ Errors use one shape: `{ error: { code, message } }`.
 1. **Home — "I have chosen 5 top rated":** curated by the owner, not computed. Stored as a list of
    product IDs in config (`FEATURED_PRODUCT_IDS`) until a CMS/admin exists.
 2. **Category — "top rated for that category":** top 3 by Fake Store `rating.rate`, then the rest.
-   Category "slug" is the URL-encoded Fake Store category name.
+   Category slug is derived from the name (`men's clothing` → `mens-clothing`).
 3. **Search:** Fake Store has no search endpoint, so the backend filters on title, description and
-   category (case-insensitive substring). Triggered on button press, per the criterion. Empty term
+   category (case-insensitive; every word in the term must match). Triggered on button press, per the criterion. Empty term
    is rejected client-side.
 4. **Product page:** tapping any product tile navigates to detail.
 5. **Enquiry:** fields = name (required), email (required, validated), phone (optional),
